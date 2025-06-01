@@ -1,0 +1,128 @@
+# Sample tests
+sample_movies:
+  - &movie0
+    title: The Dark Knight
+    year: 2008
+    description: Batman saves the world, Joker dies IRL, oh wait
+    rating: 9
+  - &movie1
+    title: Idiocracy
+    year: 2006
+    description: Nostradamus was so wrong... this nails it pretty well for our future
+    rating: 6.5
+  - &movie2
+    title: The Lord of the Rings 1-3
+    year: 2001
+    description: It's the homework that's never started as takes longest to finish.
+    rating: 6.5
+  - &snow-white
+    title: Snow White
+    year: 2025
+    description: Mickey Mouse has you at gunpoint.
+    rating: 1.6
+
+scripts:
+  # this is the full test suite referencing all the others
+  full: ["users", "movies", "collections", "failure_cases", "delete_user", "finally_exit"]
+  # you can invoke specific scripts using `--script TEST_NAME`
+  users:
+    - ["login_admin", {"score": 2.5}]
+    - ["add_user", {"score": 5}]
+    - ["get_users", {"score": 10, "expect_user_exists": True}]
+    # extra penalization test 
+    - ["add_user", {"fail_score": -5, "ignore": true, "expect_fail": True}]
+    - ["logout_admin", {"ignore": false, "score": 2.5}]
+    - ["login", {"score": 2.5}]
+    - ["get_access", {"score": 10}]
+    - ["logout", {"score": 2.5}]
+    # finally, a test for logging in with an inexistent account
+    - ["login_admin", {"ignore": true, "fail_score": -5, "expect_fail": true,
+        "test_admin": {"username": "__1337notexisting", "password": "you_shall_not_pass"}}]
+    - ["logout_admin", {"ignore": true, "ignore_error": true}]
+
+  movies:
+    - ["ensure_user_access", {}]
+    - ["get_movies", {"score": 2.5, "expect_count": false}]
+    - ["add_movie", {"score": 2.5, "movie_obj": *movie0}]
+    - ["add_movie", {"score": 2.5, "movie_obj": *movie1}]
+    - ["get_movies", {"score": 7.5, "expect_count": 2}]
+    - ["get_movie", {"score": 5, "movie_idx": 0, "expect_movie": {"title": "The Dark Knight", "year": 2008}}]
+    - ["update_movie", {"score": 1, "movie_idx": 1, "movie_obj": *snow-white}]
+    - ["get_movie", {"score": 1.5, "movie_idx": 1, "expect_movie": *snow-white}]
+    - ["delete_movie", {"score": 2.5, "movie_idx": 1}]
+    - ["get_movies", {"score": 2.5, "expect_count": 1}]
+    - ["logout", {}]
+    - ["exit", {}]
+
+  collections:
+    - ["ensure_user_access", {}]
+    - ["get_movies", {"expect_count": None}]
+    - ["get_collections", {"score": 2.5, "expect_count": 0}]
+    - ["add_movie", {"movie_obj": *movie0}]
+    - ["add_movie", {"movie_obj": *movie1}]
+    - ["add_movie", {"movie_obj": *movie2}]
+    - ["get_movies", {"fail_score": -5, "expect_count": 3}]
+    - ["add_collection", {"score": 2.5,
+        "collection_obj": {"title": "Top IMDB", "movie_idx": [0, 2]}}]
+    - ["add_collection", {"score": 2.5,
+        "collection_obj": {"title": "Must See", "movie_idx": [1, 2]}}]
+    - ["get_collections", {"score": 5, "expect_count": 2,
+        "expect_titles": ["Top IMDB", "Must See"]}]
+    - ["get_collection", {"score": 5, "collection_idx": 0,
+        "expect_collection": {"title": "Top IMDB"},
+        "expect_movies": ["The Dark Knight", "The Lord of the Rings 1-3"]}]
+    - ["delete_collection", {"score": 2.5, "collection_idx": 1}]
+    - ["get_collections", {"score": 5, "expect_count": 1, "expect_titles": ["Top IMDB"]}]
+    # check add/delete movie collection item (5p)
+    - ["add_movie_to_collection", {"score": 1.5, "collection_idx": 0, "movie_idx": 1}]
+    - ["delete_movie_from_collection", {"score": 1.5, "collection_idx": 0, "movie_idx": 0}]
+    - ["get_collection", {"score": 2, "collection_idx": 0,
+        "expect_collection": {"title": "Top IMDB"},
+        "expect_movies": ["Idiocracy", "The Lord of the Rings 1-3"]}]
+    - ["logout", {}]
+    - ["exit", {}]
+
+  failure_cases:
+    # all further tests shall run regardless of success & fail with penalization
+    - ["login_admin", {}]
+    - ["_set", {"_set_args": {"ignore": true, "fail_score": -5, "expect_fail": true}}]
+    - ["add_user", {"test_user": {"username": "invalid user w spaces", "password": "failthis"}}]
+    - ["logout_admin", {"expect_fail": false}]
+    - ["ensure_user_access", {"expect_fail": false, "ignore": false}]
+    - ["delete_user", {"test_user": {"username":"<invalid user to del>"}}]
+    - ["get_movie", {"movie_id": 99999999}]
+    - ["add_movie", {"movie_obj": {
+        "title": "Rezolvare Tema 3 PCom",
+        "year": 2025, "description": "Git Gud!", rating: 12.99
+      }}]
+    - ["update_movie", {"movie_id": 99999999, "movie_obj": *snow-white}]
+    - ["delete_movie", {"movie_id": 99999999}]
+    - ["get_collection", {"collection_id": 99999999}]
+    - ["add_collection", {"collection_obj": {
+        "title": "Error d", "movie_ids": [99999999, 19999999]}
+      }]
+    - ["delete_collection", {"collection_id": 99999999}]
+    - ["logout", {"expect_fail": false, "ignore": true}]
+    - ["exit", {"expect_fail": false, "ignore": true}]
+
+  delete_user: [
+    ["login_admin", {}],
+    ["get_users", {}], ["delete_user", {}],
+    ["get_users", {"score": 5, "expect_user_deleted": true}], 
+    ["logout_admin", {}], ["exit", {}] 
+  ]
+  finally_exit: [["exit", {"score": 2.5}]]
+
+  # use this script to clean all test_* users
+  CLEANUP: [
+    ["login_admin", {}],
+    ["get_users", {}], ["delete_all_users", { "delete_pattern": "^test_.+" }],
+    ["logout_admin", {}], ["exit", {}] 
+  ]
+  # use this script to get back an interactive CLI after automatic login
+  SHELL: [
+    ["ensure_user_access", {}],
+    ["shell", {}],
+    ["logout", {}], ["exit", {}] 
+  ]
+

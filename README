@@ -1,0 +1,67 @@
+------TEMA 4. Client web. Comunicatie cu REST API.------
+
+Această aplicație este un client HTTP scris în limbajul C, 
+care comunică cu un server REST API pentru a gestiona o bibliotecă
+virtuală de filme. Clientul permite autentificarea ca administrator
+sau utilizator normal. 
+
+Biblioteci utilizate
+
+Parson: Bibliotecă pentru parsarea și generarea de obiecte JSON în C.
+Codul sursă este inclus în proiect pentru a asigura portabilitatea și
+compatibilitatea cu checker-ul.
+
+Am luat biblioteca de aici: https://github.com/kgabis/parson
+
+Comenzi disponibile
+Clientul acceptă următoarele comenzi introduse de la tastatură:
+
+Autentificare și gestionare utilizatori:
+
+login_admin
+
+add_user
+
+get_users
+
+delete_user
+
+logout_admin
+
+Autentificare utilizator și acces la bibliotecă:
+
+login
+
+get_access
+
+logout
+
+Operații asupra filmelor:
+
+get_movies
+
+get_movie
+
+add_movie
+
+delete_movie
+
+update_movie
+
+Operații asupra colecțiilor:
+
+get_collections
+
+get_collection
+
+add_collection
+
+delete_collection
+
+add_movie_to_collection
+
+delete_movie_from_collection
+
+Ieșire din aplicație:
+
+exit
