@@ -1,67 +1,48 @@
-------TEMA 4. Client web. Comunicatie cu REST API.------
+# Assignment 4: Web Client -- Communication with a REST API
 
-Această aplicație este un client HTTP scris în limbajul C, 
-care comunică cu un server REST API pentru a gestiona o bibliotecă
-virtuală de filme. Clientul permite autentificarea ca administrator
-sau utilizator normal. 
+This application is an HTTP client written in C. It communicates with a REST API server to manage a virtual movie library and supports authentication as an administrator or a regular user.
 
-Biblioteci utilizate
+## Library
 
-Parson: Bibliotecă pentru parsarea și generarea de obiecte JSON în C.
-Codul sursă este inclus în proiect pentru a asigura portabilitatea și
-compatibilitatea cu checker-ul.
+**Parson** is used to parse and generate JSON objects in C. Its source code is included in the project for portability and compatibility with the assignment checker.
 
-Am luat biblioteca de aici: https://github.com/kgabis/parson
+Source: https://github.com/kgabis/parson
 
-Comenzi disponibile
-Clientul acceptă următoarele comenzi introduse de la tastatură:
+## Available commands
 
-Autentificare și gestionare utilizatori:
+Commands are entered through the keyboard.
 
-login_admin
+### Administrator authentication and user management
 
-add_user
+- `login_admin`
+- `add_user`
+- `get_users`
+- `delete_user`
+- `logout_admin`
 
-get_users
+### User authentication and library access
 
-delete_user
+- `login`
+- `get_access`
+- `logout`
 
-logout_admin
+### Movie operations
 
-Autentificare utilizator și acces la bibliotecă:
+- `get_movies`
+- `get_movie`
+- `add_movie`
+- `delete_movie`
+- `update_movie`
 
-login
+### Collection operations
 
-get_access
+- `get_collections`
+- `get_collection`
+- `add_collection`
+- `delete_collection`
+- `add_movie_to_collection`
+- `delete_movie_from_collection`
 
-logout
+### Exit
 
-Operații asupra filmelor:
-
-get_movies
-
-get_movie
-
-add_movie
-
-delete_movie
-
-update_movie
-
-Operații asupra colecțiilor:
-
-get_collections
-
-get_collection
-
-add_collection
-
-delete_collection
-
-add_movie_to_collection
-
-delete_movie_from_collection
-
-Ieșire din aplicație:
-
-exit
+- `exit`
